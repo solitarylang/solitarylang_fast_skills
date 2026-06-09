@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
+  <rect width="1600" height="1120" fill="#ffffff"/>
+  <text x="60" y="70" font-size="30" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">第 5 步样例：代码变更映射图</text>
+  <text x="60" y="108" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#4b5563">结构示例：源码瓶颈 + 人工确认后的修改点 + 修改后代码草图</text>
+
+  <rect x="50" y="140" width="1500" height="210" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="80" y="182" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#1f2937">源码瓶颈</text>
+  <text x="80" y="220" font-size="18" font-family="monospace" fill="#b91c1c" font-weight="700">high_risk_app.py:92-120</text>
+  <text x="80" y="252" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 360 天扫描</text>
+  <text x="80" y="282" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• explode / groupBy / join 链路放大</text>
+  <text x="80" y="312" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 冗余字段继续透传</text>
+
+  <rect x="520" y="140" width="580" height="210" rx="16" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="550" y="182" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#1f2937">人工确认的修改点</text>
+  <text x="550" y="224" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">1. 收窄扫描窗口</text>
+  <text x="550" y="256" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">2. 裁掉未消费字段</text>
+  <text x="550" y="288" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">3. 可复用链路落中间表</text>
+  <text x="550" y="320" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">4. 保留最终写入边界</text>
+
+  <rect x="1140" y="140" width="410" height="210" rx="16" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="1170" y="182" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#1f2937">修改后代码草图</text>
+  <text x="1170" y="225" font-size="15" font-family="monospace" fill="#065f46">raw_df = raw_df.select(required_cols)</text>
+  <text x="1170" y="252" font-size="15" font-family="monospace" fill="#065f46">raw_df = raw_df.filter(pt_date >= start)</text>
+  <text x="1170" y="279" font-size="15" font-family="monospace" fill="#065f46">apps = apps.select(kept_cols)</text>
+  <text x="1170" y="306" font-size="15" font-family="monospace" fill="#065f46">result = result.select(final_cols)</text>
+
+  <line x1="1050" y1="245" x2="1130" y2="245" stroke="#2563eb" stroke-width="4" stroke-dasharray="10 8"/>
+  <polygon points="1130,245 1118,238 1118,252" fill="#2563eb"/>
+
+  <rect x="50" y="390" width="1500" height="620" rx="16" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="80" y="436" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#1f2937">章节要求</text>
+  <text x="80" y="478" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 说明为什么能改</text>
+  <text x="80" y="510" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 说明改动后的代码草图</text>
+  <text x="80" y="542" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 说明人工确认后的边界</text>
+  <text x="80" y="574" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 图中文字必须中文，代码保留原样</text>
+
+  <rect x="520" y="420" width="560" height="520" rx="18" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="550" y="460" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">流程边界</text>
+  <text x="550" y="498" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">第 5 步只负责人工确认后的代码落地，不做优化前后运行对比。</text>
+  <text x="550" y="532" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">输出物：确认版报告、代码快照、源码->变更映射图。</text>
+  <text x="550" y="566" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">如果无法明确修改内容，就写修改思路和待确认点。</text>
+  <text x="550" y="600" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">不能硬塞与瓶颈无关的代码。</text>
+
+  <rect x="1140" y="420" width="410" height="520" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="1170" y="460" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">建议目录</text>
+  <text x="1170" y="500" font-size="15" font-family="monospace" fill="#111827">output/&lt;case&gt;/</text>
+  <text x="1170" y="530" font-size="15" font-family="monospace" fill="#111827">  final_optimization_report.md</text>
+  <text x="1170" y="560" font-size="15" font-family="monospace" fill="#111827">  step5_code_change.png</text>
+  <text x="1170" y="590" font-size="15" font-family="monospace" fill="#111827">  step5_code_change.svg</text>
+  <text x="1170" y="620" font-size="15" font-family="monospace" fill="#111827">  source_before/</text>
+  <text x="1170" y="650" font-size="15" font-family="monospace" fill="#111827">  source_after/</text>
+  <text x="1170" y="690" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">样例只用于约束版式。</text>
+</svg>

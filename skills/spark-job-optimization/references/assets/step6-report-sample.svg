@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
+  <rect width="1600" height="1120" fill="#ffffff"/>
+  <text x="60" y="70" font-size="30" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">第 6 步样例：优化结果映射图</text>
+  <text x="60" y="108" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#4b5563">结构示例：优化前 / 优化后运行差异 + 源码到执行情况的映射</text>
+
+  <rect x="50" y="140" width="1500" height="260" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="80" y="182" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#1f2937">优化前 / 优化后对比</text>
+  <text x="90" y="232" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">总体运行时长：12.3 h  →  35 min</text>
+  <text x="90" y="268" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">主扫描 stage 任务数：70823  →  565</text>
+  <text x="90" y="304" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">失败 stage：1  →  0</text>
+  <text x="90" y="340" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">失败 task：928 failed / 68 failed / 3 failed 等  →  少量 killed / another attempt succeeded</text>
+
+  <rect x="750" y="170" width="360" height="190" rx="16" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="780" y="212" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">优化前执行</text>
+  <text x="780" y="250" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">TiB 级扫描、小时级 stage、失败 task 较多。</text>
+  <text x="780" y="284" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">关注点：长尾、shuffle、重复扫描。</text>
+
+  <rect x="1150" y="170" width="360" height="190" rx="16" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="1180" y="212" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">优化后执行</text>
+  <text x="1180" y="250" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">主链路收敛到分钟级，失败 stage 消失。</text>
+  <text x="1180" y="284" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#1f2937">关注点：是否还有中等规模 shuffle。</text>
+
+  <line x1="1110" y1="265" x2="1140" y2="265" stroke="#2563eb" stroke-width="4" stroke-dasharray="10 8"/>
+  <polygon points="1140,265 1128,258 1128,272" fill="#2563eb"/>
+
+  <rect x="50" y="440" width="1500" height="500" rx="16" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="80" y="484" font-size="22" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#1f2937">源码 -> 执行情况映射</text>
+  <text x="80" y="524" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 源码中的 360 天扫描、explode、join、groupBy 需要能回指到前后执行差异</text>
+  <text x="80" y="558" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 优化前证据与优化后证据要放在同一张图里，便于直接对照</text>
+  <text x="80" y="592" font-size="16" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">• 说明文字必须中文，代码与命令保留原样</text>
+
+  <rect x="80" y="640" width="660" height="230" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="110" y="682" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">优化前代码 / 运行证据</text>
+  <text x="110" y="722" font-size="15" font-family="monospace" fill="#b91c1c">WHERE pt_date &lt;= '{str_anchor}' AND pt_date &gt;= '{start_date}'</text>
+  <text x="110" y="754" font-size="15" font-family="monospace" fill="#b91c1c">df.count()  # 触发完整 DAG</text>
+  <text x="110" y="790" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">Stage 1：7.1 TiB 输入，70823 tasks</text>
+
+  <rect x="860" y="640" width="660" height="230" rx="16" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="890" y="682" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">优化后代码 / 运行证据</text>
+  <text x="890" y="722" font-size="15" font-family="monospace" fill="#065f46">raw_df = raw_df.select(required_cols)</text>
+  <text x="890" y="754" font-size="15" font-family="monospace" fill="#065f46">raw_df = raw_df.filter(pt_date &gt;= start_pt_date)</text>
+  <text x="890" y="790" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">Stage 1：35 min，565 tasks</text>
+</svg>
