@@ -40,8 +40,8 @@
 - 可直接应用的条目
 - 按预期影响度排序，其次按风险排序
 - 包含一个简短 `总结` 小节，说明这个任务在做什么、核心逻辑是什么
-- 这一节将作为最终报告的第 4 章，因此正文必须贴近 `references/step-4-report-template.md`
-- 第 4 章图片的版式必须参考 `references/assets/step4-report-sample.svg` 和 `references/assets/step4-report-sample.png`
+- 这一节将作为最终报告的第 4 章，因此正文必须贴近 `step-4-report-template.md`
+- 第 4 章图片的版式必须参考 `../../../references/assets/step4-report-sample.svg` 和 `../../../references/assets/step4-report-sample.png`
 - 当 scan 量过大时，可以把“构建中间表 / 中间快照”作为一类标准化建议
 - 当 scan 量很大，但到第一个 shuffle 前 `read / input` 明显降下来时，可以把这段链路优先前置成中间表或中间快照，让后续 shuffle 处理的是更小、更稳定的输入
 - 当 scan 的是 130 天、360 天这类长历史分区全量表，或者同一批历史数据会反复执行时，可以把“中间表 / 增量计算 / 解析结果复用”作为一类标准化建议
@@ -57,7 +57,7 @@
 
 ## 报告图片
 
-第 4 步报告必须输出为 `output/<case_name>/` 下的一张图，除代码和命令外，所有描述句都必须能被执行日志直接支持。
+第 4 步报告必须输出为 `<business_repo_root>/tmp/spark-job-optimization/<case_name>/output/` 下的一张图，除代码和命令外，所有描述句都必须能被执行日志直接支持。
 
 ### 推荐格式
 

@@ -2,7 +2,7 @@
 
 这是最终优化报告中的第 4 章模板，不是整份报告的总模板。第 1 到第 3 章应分别由源码分析、运行日志分析和根因分析承接。
 
-图片结构参考 `references/assets/step4-report-sample.svg` / `references/assets/step4-report-sample.png`，正文结构参考 `references/assets/final-report-sample.md`。
+图片结构参考 `../../../references/assets/step4-report-sample.svg` / `../../../references/assets/step4-report-sample.png`，正文结构参考 `../../../references/assets/final-report-sample.md`。
 
 ## 章节定位
 

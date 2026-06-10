@@ -299,7 +299,7 @@ def render_markdown(ctx: CaseContext) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Collect case context for PySpark optimization.")
-    parser.add_argument("case_dir", type=Path, help="Path to input/<case_name>")
+    parser.add_argument("case_dir", type=Path, help="Path to <business_repo_root>/tmp/spark-job-optimization/<case_name>")
     parser.add_argument("--output", type=Path, help="Optional markdown output path")
     args = parser.parse_args()
 

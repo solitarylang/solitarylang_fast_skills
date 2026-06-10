@@ -43,11 +43,11 @@
 
   <rect x="1140" y="420" width="410" height="520" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
   <text x="1170" y="460" font-size="20" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700" fill="#111827">建议目录</text>
-  <text x="1170" y="500" font-size="15" font-family="monospace" fill="#111827">output/&lt;case&gt;/</text>
-  <text x="1170" y="530" font-size="15" font-family="monospace" fill="#111827">  final_optimization_report.md</text>
-  <text x="1170" y="560" font-size="15" font-family="monospace" fill="#111827">  step5_code_change.png</text>
-  <text x="1170" y="590" font-size="15" font-family="monospace" fill="#111827">  step5_code_change.svg</text>
-  <text x="1170" y="620" font-size="15" font-family="monospace" fill="#111827">  source_before/</text>
-  <text x="1170" y="650" font-size="15" font-family="monospace" fill="#111827">  source_after/</text>
+  <text x="1170" y="500" font-size="15" font-family="monospace" fill="#111827">&lt;business_repo_root&gt;/tmp/spark-job-optimization/&lt;case_name&gt;/output/</text>
+  <text x="1170" y="530" font-size="15" font-family="monospace" fill="#111827">  report/final_optimization_report.md</text>
+  <text x="1170" y="560" font-size="15" font-family="monospace" fill="#111827">  figures/step5_code_change.png</text>
+  <text x="1170" y="590" font-size="15" font-family="monospace" fill="#111827">  figures/step5_code_change.svg</text>
+  <text x="1170" y="620" font-size="15" font-family="monospace" fill="#111827">  input/source_before/</text>
+  <text x="1170" y="650" font-size="15" font-family="monospace" fill="#111827">  input/source_after/</text>
   <text x="1170" y="690" font-size="15" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" fill="#374151">样例只用于约束版式。</text>
 </svg>

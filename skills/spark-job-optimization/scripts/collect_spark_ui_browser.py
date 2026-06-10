@@ -6,12 +6,16 @@ user's logged-in Chrome session. It opens the target Spark UI pages in Chrome,
 extracts the page DOM, preserves table-like blocks in Markdown where possible,
 and saves the result as reusable artifacts under the case folder.
 
+This helper only supports Google Chrome with the current user's logged-in
+session. It does not attempt any alternate browser, login, proxy, or API
+route.
+
 The collection strategy is intentionally simple and reproducible:
 
 1. Open the Spark UI base URL in Chrome.
 2. Visit the key pages one by one.
 3. Extract the page DOM with table preservation when possible.
-4. Save page Markdown, preserved table-like blocks, title, and URL to `spark_ui/browser/`.
+4. Save page Markdown, preserved table-like blocks, title, and URL to `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/browser/`.
 5. For large stage detail pages, keep the visible first page of task rows only; do not try to enumerate every task page.
 6. If the output directory already exists, overwrite the previous browser snapshot.
 
@@ -434,14 +438,14 @@ def collect_spark_ui(
     manifest_md.append("- 每个文件都保存了浏览器导航后可见的页面内容，优先保留表格块为 Markdown table。")
     manifest_md.append("- `details/` 目录保存自动下钻的 job / stage 详情页，里面的 task 表也会按表格保留；如果 task 数量过多，只保留当前第一页 task 明细。")
     manifest_md.append("- 这个采集方式依赖当前 Chrome 登录态。")
-    manifest_md.append("- 将生成的 `spark_ui/browser/` 目录交给 `collect_case_context.py` 继续处理。")
+    manifest_md.append("- 将生成的 `input/spark_ui/browser/` 目录交给 `collect_case_context.py` 继续处理。")
     (out_dir / "manifest.md").write_text("\n".join(manifest_md) + "\n", encoding="utf-8")
     return artifacts
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Collect Spark UI pages from an authenticated Chrome session.")
-    parser.add_argument("--base-url", required=True, help="Spark UI proxy base URL, ending at the application root")
+    parser = argparse.ArgumentParser(description="Collect Spark UI pages from the current machine's logged-in Google Chrome session.")
+    parser.add_argument("--base-url", required=True, help="Spark UI or YARN application URL to open in Chrome")
     parser.add_argument(
         "--output-dir",
         required=True,

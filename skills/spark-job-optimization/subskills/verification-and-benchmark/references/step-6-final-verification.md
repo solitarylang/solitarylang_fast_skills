@@ -6,9 +6,9 @@
 
 ## 输入
 
-- 优化前 Spark UI / 日志快照：`spark_ui/browser/`
-- 优化后 Spark UI / 日志快照：`spark_ui/optimized_browser/`
-- 优化前 / 优化后代码快照：`source_before/`、`source_after/` 或 `source/`、`source_optimized/`
+- 优化前 Spark UI / 日志快照：`<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/browser/`
+- 优化后 Spark UI / 日志快照：`<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/optimized_browser/`
+- 优化前 / 优化后代码快照：`<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/source_before/`、`.../input/source_after/` 或 `.../input/source/`、`.../input/source_optimized/`
 - 第 5 步确认后的代码变更说明
 
 ## 流程
@@ -23,7 +23,7 @@
 - 优化效果报告素材
 - 优化前后关键指标对比
 - 源码 -> 执行情况映射图
-- 推荐文件名：`optimization_result.svg` / `optimization_result.png`
+- 推荐落盘位置：`<business_repo_root>/tmp/spark-job-optimization/<case_name>/output/figures/optimization_result.svg` / `.../optimization_result.png`
 - 效果结论
 - 新经验和可复用规则
 
@@ -33,4 +33,4 @@
 - 这张图要体现优化前执行情况、优化后执行情况和对应的代码变更关系。
 - 说明文字必须是中文，代码和命令保留原样。
 - 如果文字可能越界，优先增加留白或缩小字号，不允许压线或越框。
-- 图片结构优先参考 `references/assets/step6-report-sample.svg` 与 `references/assets/step6-report-sample.png`。
+- 图片结构优先参考 `../../../references/assets/step6-report-sample.svg` 与 `../../../references/assets/step6-report-sample.png`。

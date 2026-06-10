@@ -16,13 +16,13 @@
 把采集结果放到：
 
 ```text
-input/<case_name>/context/
+<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/context/
 ```
 
 建议文件：
 
 ```text
-input/<case_name>/context/
+<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/context/
   context_report.md
   cluster.md
   upstream_tables.md
@@ -33,8 +33,8 @@ input/<case_name>/context/
 
 优先使用 `scripts/collect_case_context.py`。
 
-如果 Spark UI 只能通过用户登录态 Chrome 访问，就先用 `scripts/collect_spark_ui_browser.py` 把页面内容采集到 `spark_ui/browser/`，尽量保留表格块为 Markdown table，再对 case 目录运行 `collect_case_context.py`。
-同一个 case 在分析阶段重复采集时，默认覆盖 `spark_ui/browser/` 这份当前快照；只有最终优化后重新抓取时，才另存到单独目录做前后对比。
+如果 Spark UI 只能通过用户登录态 Chrome 访问，就先用 `scripts/collect_spark_ui_browser.py` 把页面内容采集到 `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/browser/`，尽量保留表格块为 Markdown table，再对 case 工作区运行 `collect_case_context.py`。
+同一个 case 在分析阶段重复采集时，默认覆盖 `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/browser/` 这份当前快照；只有最终优化后重新抓取时，才另存到单独目录做前后对比。
 
 如果某个值不能自动采集，脚本要输出可手工查询的命令或 SQL。
 

@@ -8,7 +8,7 @@
 
 ### 1.1 输入与执行路径
 
-- 输入：`source/`
+- 输入：`input/source/`
 - 主链路：入口 -> 关键 transformation -> action
 - 需要明确按 Spark stage 拆分代码范围
 

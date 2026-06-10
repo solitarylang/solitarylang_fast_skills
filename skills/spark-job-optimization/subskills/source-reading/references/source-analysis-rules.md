@@ -6,9 +6,9 @@
 
 ## 输入
 
-- `input/<case_name>/source.zip` 或 `input/<case_name>/source/`
-- `input/<case_name>/context/context_report.md`（如有）
-- `input/<case_name>/spark_ui/browser/` 或 `eventlog/` 中可用于 stage 对齐的证据
+- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/source.zip` 或 `.../input/source/`
+- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/context/context_report.md`（如有）
+- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/browser/` 或 `input/eventlog/` 中可用于 stage 对齐的证据
 
 ## 工作方式
 

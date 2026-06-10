@@ -21,12 +21,12 @@
 - 第 4 章基于根因输出优化方案和待确认项。
 - 第 5 章补人工确认后的代码变更、代码快照和映射图。
 - 第 6 章补优化后验证、前后对比和经验沉淀。
-- `output/<case_name>/` 下保留第 4 章单独的文字版和图片版。
-- 版式优先参考 `references/final-report-template.md`。
-- 第 4 章细节和图片继续参考 `references/step-4-report-template.md` 与 `references/assets/step4-report-sample.svg`。
-- 第 5 章变更映射图参考 `references/step-5-code-change.md` 与对应样例资源。
-- 第 6 章优化结果图参考 `references/step-6-final-verification.md` 与对应样例资源。
-- 第 6 章对比基于 `spark_ui/browser/` 和 `spark_ui/optimized_browser/`。
+- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/output/` 下保留第 4 章单独的文字版和图片版。
+- 版式优先参考 `final-report-template.md`。
+- 第 4 章细节和图片继续参考 `../../subskills/diagnosis-and-proposal/references/step-4-report-template.md` 与 `../assets/step4-report-sample.svg`。
+- 第 5 章变更映射图参考 `step-5-code-change.md` 与对应样例资源。
+- 第 6 章优化结果图参考 `../../subskills/verification-and-benchmark/references/step-6-final-verification.md` 与对应样例资源。
+- 第 6 章对比基于 `input/spark_ui/browser/` 和 `input/spark_ui/optimized_browser/`。
 - 正文是主载体，图片是细节展开；每章正文都必须内嵌对应的映射关系表，不能只靠附件图片表达主结论。
 
 ## 每章必须产出

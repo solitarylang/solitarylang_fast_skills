@@ -5,6 +5,9 @@
 ## 文件
 
 - `final-report-sample.md`：最终优化报告的结构样例，推荐作为后续正文报告的章节顺序参考。
+- `end-to-end-demo.md`：端到端完整演示样例，展示从输入到第 6 步验证的全流程输出格式。
+- `rendering-contract.md`：渲染契约，定义通用渲染器和自动降级原则。
+- `report-bundle-schema.md`：报告产物契约，定义结构化中间产物和输出文件布局。
 - `step4-report-sample.svg`：第 4 步总览图样例，推荐作为后续图片生成的结构参考。
 - `step4-report-sample.png`：同一张样例图的位图版本，便于快速预览。
 - `step5-report-sample.md`：第 5 步确认版报告样例，推荐作为后续正文报告的结构参考。

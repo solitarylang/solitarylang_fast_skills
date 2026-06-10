@@ -11,8 +11,8 @@
 
 ## 2. 优化前 / 优化后代码快照对比
 
-- 优化前代码：`source_before/`
-- 优化后代码：`source_after/`
+- 优化前代码：`input/source_before/`
+- 优化后代码：`input/source_after/`
 - 变更摘要：保留最小必要改动
 
 ## 3. 源码 -> 代码变更映射图
