@@ -1,0 +1,8 @@
+interface:
+  display_name: "Work Report Decks"
+  short_description: "Create styled PPTX work reports"
+  brand_color: "#1F4E79"
+  default_prompt: "Use $generate-work-report to first turn my notes and style rules into a reviewable outline, then render the confirmed outline into a polished PPTX work report."
+
+policy:
+  allow_implicit_invocation: true
