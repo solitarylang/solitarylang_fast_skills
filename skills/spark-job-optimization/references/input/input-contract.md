@@ -53,6 +53,18 @@
 - `input/spark_ui/browser/details/` 下的重要 job / stage 详情页 Markdown
 - `input/spark_ui/browser/manifest.md`
 
+浏览器采集文件必须和页面一一对应，默认规则如下：
+
+- `environment.md` 只写 Environment 页面内容
+- `jobs.md` 只写 Jobs 页面内容
+- `stages.md` 只写 Stages 页面内容
+- `executors.md` 只写 Executors 页面内容
+- `sql.md` 只写 SQL 页面内容
+- `details/job-<id>.md` 只写对应 job 详情页
+- `details/stage-<id>.md` 只写对应 stage 详情页
+- 如果页面实际打开的 URL 与期望 URL 不一致，不要把其他页面内容写进这个文件，改为在同名文件里记录 `mismatch` 失败证据，并在 `manifest.md` / `manifest.json` 中标明期望链接与实际链接
+- 如果某页没有采到有效内容，也要保留对应文件和 manifest 记录，不能把缺失页的内容挪到其他文件里
+
 同一个 case 在分析阶段重复采集时，默认覆盖 `input/spark_ui/browser/` 这份当前快照，不要每次都新增并行目录。
 如果要保留最终优化后的对比版本，建议另存到单独目录，例如 `input/spark_ui/optimized_browser/`，并在 `notes.md` 里说明它是优化后快照。
 分析前的 Spark UI 视为“优化前快照”，优化完成后重新采集的 Spark UI 视为“优化后快照”，两者都要保留，方便做前后对比。

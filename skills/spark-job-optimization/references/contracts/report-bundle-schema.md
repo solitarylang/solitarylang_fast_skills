@@ -41,6 +41,17 @@
     "before": "input/spark_ui/browser/",
     "after": "input/spark_ui/optimized_browser/"
   },
+  "spark_ui_browser_manifest": {
+    "file": "input/spark_ui/browser/manifest.json",
+    "pages": [
+      {
+        "page": "environment",
+        "expected_url": "https://...",
+        "captured_url": "https://...",
+        "status": "ok"
+      }
+    ]
+  },
   "report_files": [
     "report/final-report.md",
     "report/step4.md",
@@ -120,6 +131,12 @@
 5. `manifest.json`
 6. Markdown 报告
 7. 图片展示
+
+## 浏览器采集要求
+
+- 浏览器采集结果必须保留 `manifest.json` / `manifest.md`
+- 每个页面文件必须和 `manifest` 里的 `page`、`expected_url`、`captured_url` 一一对应
+- 如果页面采集失败，文件仍然要保留，但必须标成失败证据，不能写入其他页面的内容
 
 ## 为什么这样更稳
 

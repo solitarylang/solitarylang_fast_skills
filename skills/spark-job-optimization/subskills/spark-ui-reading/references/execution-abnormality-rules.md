@@ -16,6 +16,7 @@
 6. 执行链路里存在 action 或额外触发，导致完整 lineage 被重复执行，但看不出明确业务必要性。
 7. 运行过程中生成了大量中间行或中间列，最后又被丢弃。
 8. 出现小文件压力、分区过碎，或者 shuffle stage 明显过大。
+9. Spark 参数和运行日志明显冲突，例如 executor memory 很大但频繁 spill / GC，executor 数很少但 stage 并行度明显不足，shuffle partitions 明显过粗或过碎。
 
 ## 当前判定维度
 
@@ -50,3 +51,4 @@
 - `count()` 类 action 触发的重复 lineage
 - 未使用特征分支造成的浪费
 - 小文件主导的读写模式
+- Spark 参数与日志冲突导致的调参候选

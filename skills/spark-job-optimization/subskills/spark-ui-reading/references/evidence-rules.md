@@ -37,6 +37,20 @@
 
 标签只能基于 Spark UI、运行日志或 event log 中直接可见的证据。
 
+### 优先级较高的日志判断标签
+
+下面这些标签适合先做第一轮自动判定，再决定要不要继续深挖：
+
+- `data_skew_label`：shuffle read / write 存在明显倾斜，优先检查热点 key、极端大分区、长尾 task
+- `compute_waste_label`：运行时间过长、内存分配明显偏大、GC 偏高或 spill 明显，优先检查资源浪费和执行参数是否失配
+- `runtime_gt_1h_label`：运行时长超过 60 分钟，优先进入长链路、重复扫描、超大 stage 的判断
+- `submit_wait_gt_10min_label`：排队或提交等待超过 10 分钟，优先检查队列拥塞和资源可用性
+- `memory_waste_label`：分配内存显著大于输入规模，优先检查是否存在过配或错误的资源申请
+- `memory_alloc_insufficient_label`：分配内存小于输入规模，优先检查是否存在明显低配
+- `data_skew_read_label` / `data_skew_write_label`：用于定位 shuffle 读 / 写倾斜的具体方向
+- `full_gc_label`：major GC 占比偏高，优先检查对象膨胀、缓存压力和过度分配
+- `spill_disk_label`：存在明显 spill disk，优先检查 executor memory、partition 大小和 join / sort / agg 路径
+
 ### 失败与重试
 
 - `task_failed_label`：`final_state = failed`

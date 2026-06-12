@@ -154,6 +154,7 @@ select
     coalesce(top_streak.p0_p1_runtime_top50_label, 0) as p0_p1_runtime_top50_label,
     coalesce(top_streak.non_p0_p1_runtime_top100_label, 0) as non_p0_p1_runtime_top100_label,
     coalesce(top_streak.non_p0_p1_runtime_top50_label, 0) as non_p0_p1_runtime_top50_label,
+    -- 下面这些标签直接基于 Spark UI / 运行日志可观察到的指标，供后续诊断和自动判断复用。
     case when coalesce(job_current_day.elapsed_time_min, 0) > 60 then 1 else 0 end as runtime_gt_1h_label,
     case when coalesce(job_current_day.queue_wait_time, 0) > 10 then 1 else 0 end as submit_wait_gt_10min_label,
     case
@@ -183,6 +184,13 @@ select
         else 0
     end as data_skew_write_label,
     case
+        when (
+            coalesce(job_current_day.gb_max_shuffle_read_size, 0) > coalesce(job_current_day.gb_avg_shuffle_read_size, 0) * 2
+            or coalesce(job_current_day.gb_max_shuffle_write_size, 0) > coalesce(job_current_day.gb_avg_shuffle_write_size, 0) * 2
+        ) then 1
+        else 0
+    end as data_skew_label,
+    case
         when job_current_day.major_gc_time is not null
              and job_current_day.task_time is not null
              and job_current_day.task_time > 0
@@ -193,6 +201,23 @@ select
         when job_current_day.spill_disk_gb is not null and job_current_day.spill_disk_gb > 0 then 1
         else 0
     end as spill_disk_label,
+    case
+        when coalesce(job_current_day.elapsed_time_min, 0) > 60
+             or (
+                 job_current_day.avg_memory_allocate_gb is not null
+                 and job_current_day.input_size_gb is not null
+                 and job_current_day.avg_memory_allocate_gb > job_current_day.input_size_gb * 2.5
+             )
+             or (
+                 job_current_day.major_gc_time is not null
+                 and job_current_day.task_time is not null
+                 and job_current_day.task_time > 0
+                 and job_current_day.major_gc_time / job_current_day.task_time > 0.2
+             )
+             or (job_current_day.spill_disk_gb is not null and job_current_day.spill_disk_gb > 0)
+        then 1
+        else 0
+    end as compute_waste_label,
     case
         when
             (case when lower(coalesce(job_current_day.final_state, '')) = 'failed' then 1 else 0 end) = 0
@@ -216,6 +241,8 @@ select
                           and coalesce(job_current_day.airflow_try_number, 0) > 3 then 1
                      else 0
                  end) = 0
+            and (case when coalesce(job_current_day.elapsed_time_min, 0) > 60 then 1 else 0 end) = 0
+            and (case when coalesce(job_current_day.queue_wait_time, 0) > 10 then 1 else 0 end) = 0
             and (case when coalesce(top_streak.mu_top100_label, 0) = 1 then 1 else 0 end) = 0
             and (case when coalesce(top_streak.mu_top50_label, 0) = 1 then 1 else 0 end) = 0
             and (case when coalesce(top_streak.runtime_top100_label, 0) = 1 then 1 else 0 end) = 0
@@ -269,4 +296,3 @@ from job_current_day
 left join task_7d_top_streak top_streak
     on job_current_day.task_table_name = top_streak.task_table_name
 ;
-

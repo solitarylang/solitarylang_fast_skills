@@ -28,6 +28,7 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 import time
 import shutil
 from dataclasses import dataclass, asdict
@@ -36,14 +37,63 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
 DEFAULT_PAGES = ["environment", "jobs", "stages", "executors", "sql"]
+MAX_CAPTURE_RETRIES = 3
+
+PAGE_CONTENT_RULES: dict[str, dict[str, list[str]]] = {
+    "environment": {
+        "required_any": ["spark properties", "spark conf", "spark version"],
+        "forbidden": [
+            "stages for all jobs",
+            "active stages",
+            "pending stages",
+            "completed stages",
+            "stage id",
+            "tasks: succeeded/total",
+        ],
+    },
+    "jobs": {
+        "required_any": ["jobs for all jobs", "job id", "active jobs", "completed jobs"],
+        "forbidden": [
+            "stages for all jobs",
+            "active stages",
+            "pending stages",
+            "completed stages",
+            "stage id",
+            "tasks: succeeded/total",
+        ],
+    },
+    "stages": {
+        "required_any": ["stages for all jobs", "stage id", "active stages", "pending stages", "completed stages"],
+        "forbidden": ["jobs for all jobs", "job id", "executor id"],
+    },
+    "executors": {
+        "required_any": ["executor id", "show additional metrics", "thread dump"],
+        "forbidden": ["stages for all jobs", "active stages", "pending stages", "completed stages", "stage id"],
+    },
+    "sql": {
+        "required_any": ["sql"],
+        "forbidden": [
+            "stages for all jobs",
+            "active stages",
+            "pending stages",
+            "completed stages",
+            "stage id",
+            "tasks: succeeded/total",
+        ],
+    },
+}
 
 
 @dataclass
 class PageArtifact:
     page: str
+    expected_url: str
+    captured_url: str
     url: str
     title: str
     file_name: str
+    status: str = "ok"
+    note: str = ""
     kind: str = "page"
 
 
@@ -102,6 +152,30 @@ def _resolve_page_spec(base_url: str, page_spec: str, index: int) -> tuple[str, 
     return page_spec, _build_page_url(base_url, page_spec)
 
 
+def _normalize_url(value: str) -> tuple[str, str, str, tuple[tuple[str, str], ...], str]:
+    parsed = urlsplit(value)
+    segments = [segment for segment in parsed.path.split("/") if segment]
+    if segments[:2] and len(segments) >= 3 and segments[0] == "proxy" and segments[1].startswith("application_"):
+        canonical_segments = segments[1:]
+    elif len(segments) >= 4 and segments[0] == "history" and segments[1].startswith("application_"):
+        canonical_segments = [segments[1]] + segments[3:]
+    else:
+        canonical_segments = segments
+    path = "/" + "/".join(canonical_segments) if canonical_segments else "/"
+    query = tuple(
+        sorted(
+            (key, value)
+            for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+            if key not in {"originHost", "originIp", "originPort", "originSchema"}
+        )
+    )
+    return parsed.scheme, parsed.netloc, path, query, parsed.fragment
+
+
+def _urls_match(expected_url: str, captured_url: str) -> bool:
+    return _normalize_url(expected_url) == _normalize_url(captured_url)
+
+
 def _open_url(url: str) -> None:
     script = f'''
 tell application "Google Chrome"
@@ -158,6 +232,29 @@ end tell
     title = _run_osascript('tell application "Google Chrome" to get title of active tab of front window')
     url = _run_osascript('tell application "Google Chrome" to get URL of active tab of front window')
     return {"title": title, "url": url, "text": result.stdout, "tables": []}
+
+
+def _capture_page_for_expected_url(
+    expected_url: str,
+    page: str,
+    *,
+    wait_seconds: float,
+    retries: int = MAX_CAPTURE_RETRIES,
+) -> tuple[dict[str, object], str, str, bool, int]:
+    last_snapshot: dict[str, object] = {}
+    last_title = ""
+    last_url = ""
+    for attempt in range(1, retries + 1):
+        snapshot = _capture_page_snapshot()
+        last_snapshot = snapshot
+        last_title = str(snapshot.get("title") or "")
+        last_url = str(snapshot.get("url") or "")
+        content_match, _ = _page_content_matches(page, snapshot)
+        if last_url and _urls_match(expected_url, last_url) and content_match:
+            return snapshot, last_title, last_url, True, attempt
+        if attempt < retries:
+            time.sleep(wait_seconds)
+    return last_snapshot, last_title, last_url or expected_url, False, retries
 
 
 def _write_page_artifact(out_dir: Path, page: str, content: str) -> Path:
@@ -277,6 +374,40 @@ def _render_page_markdown(page: str, title: str, url: str, snapshot: dict[str, o
     return "\n".join(parts)
 
 
+def _render_page_failure_markdown(
+    page: str,
+    title: str,
+    expected_url: str,
+    captured_url: str,
+    snapshot: dict[str, object],
+    *,
+    note: str,
+) -> str:
+    content = str(snapshot.get("text") or "")
+    return "\n".join(
+        [
+            f"# `{page}`",
+            "",
+            "- 采集状态：`mismatch`",
+            f"- 期望链接：`{expected_url}`",
+            f"- 实际链接：`{captured_url or '未获取到'}`",
+            f"- 标题：`{title or page}`",
+            f"- 备注：`{note}`",
+            "",
+            "## 说明",
+            "",
+            "当前采集到的页面与期望页面不一致，因此本文件只记录失败证据，不将其作为该页的有效内容。",
+            "",
+            "## 当前可见内容",
+            "",
+            "```text",
+            content.rstrip() or "未获取到可见内容",
+            "```",
+            "",
+        ]
+    )
+
+
 def _snapshot_to_search_text(snapshot: dict[str, object]) -> str:
     pieces: list[str] = [str(snapshot.get("text") or "")]
     for table_meta in snapshot.get("tables", []) or []:
@@ -285,10 +416,50 @@ def _snapshot_to_search_text(snapshot: dict[str, object]) -> str:
     return "\n".join(piece for piece in pieces if piece)
 
 
+def _page_content_matches(page: str, snapshot: dict[str, object]) -> tuple[bool, str]:
+    rules = PAGE_CONTENT_RULES.get(page)
+    if not rules:
+        return True, ""
+    text = _snapshot_to_search_text(snapshot).lower()
+    required_any = rules.get("required_any", [])
+    forbidden = rules.get("forbidden", [])
+    if required_any and not any(marker in text for marker in required_any):
+        return False, f"页面内容未命中预期标记：{', '.join(required_any)}"
+    bad_markers = [marker for marker in forbidden if marker in text]
+    if bad_markers:
+        return False, f"页面内容命中不应出现的标记：{', '.join(bad_markers)}"
+    return True, ""
+
+
 def _reset_output_dir(out_dir: Path) -> None:
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+
+def _write_manifest(out_dir: Path, base_url: str, artifacts: list[PageArtifact]) -> None:
+    manifest = {
+        "base_url": base_url,
+        "pages": [asdict(item) for item in artifacts],
+    }
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+    manifest_md = ["# Spark 界面浏览器采集", ""]
+    manifest_md.append(f"基础链接：`{base_url}`")
+    manifest_md.append("")
+    manifest_md.append("| 页面 | 状态 | 期望链接 | 实际链接 | 文件 |")
+    manifest_md.append("|---|---|---|---|---|")
+    for item in artifacts:
+        manifest_md.append(
+            f"| `{item.page}` | `{item.status}` | `{item.expected_url}` | `{item.captured_url or '未获取到'}` | `{item.file_name}` |"
+        )
+    manifest_md.append("")
+    manifest_md.append("## 说明")
+    manifest_md.append("")
+    manifest_md.append("- 每个文件都保存了浏览器导航后可见的页面内容，优先保留表格块为 Markdown table。")
+    manifest_md.append("- `details/` 目录保存自动下钻的 job / stage 详情页，里面的 task 表也会按表格保留；如果 task 数量过多，只保留当前第一页 task 明细。")
+    manifest_md.append("- 这个采集方式依赖当前 Chrome 登录态。")
+    manifest_md.append("- 将生成的 `input/spark_ui/browser/` 目录交给 `collect_case_context.py` 继续处理。")
+    (out_dir / "manifest.md").write_text("\n".join(manifest_md) + "\n", encoding="utf-8")
 
 
 def _extract_candidate_ids(content: str, page: str) -> list[str]:
@@ -362,23 +533,44 @@ def _collect_detail_pages(
             detail_name = f"job-{item_id}"
         _open_url(detail_url)
         time.sleep(wait_seconds)
-        snapshot = _capture_page_snapshot()
-        title = str(snapshot.get("title") or detail_name)
-        current_url = str(snapshot.get("url") or detail_url)
-        file_path = _write_page_artifact(
-            detail_dir,
-            detail_name,
-            _render_page_markdown(detail_name, title, current_url, snapshot),
+        snapshot, title, current_url, matched, attempts = _capture_page_for_expected_url(
+            detail_url, detail_name, wait_seconds=wait_seconds
         )
+        content_ok, content_note = _page_content_matches(detail_name, snapshot)
+        note = f"detail-page capture attempts={attempts}"
+        if not content_ok:
+            note = f"{note}; {content_note}"
+        content = (
+            _render_page_markdown(detail_name, title, current_url, snapshot)
+            if matched
+            else _render_page_failure_markdown(
+                detail_name,
+                title,
+                detail_url,
+                current_url,
+                snapshot,
+                note=note,
+            )
+        )
+        file_path = _write_page_artifact(detail_dir, detail_name, content)
         artifacts.append(
             PageArtifact(
                 page=detail_name,
-                url=current_url or detail_url,
+                expected_url=detail_url,
+                captured_url=current_url or "",
+                url=detail_url,
                 title=title,
                 file_name=str(file_path.relative_to(out_dir.parent)),
+                status="ok" if matched else "mismatch",
+                note=note,
                 kind=f"{page_kind}-detail",
             )
         )
+        if not matched:
+            _write_manifest(out_dir, base_url, artifacts)
+            raise RuntimeError(
+                f"Spark UI {detail_name} 采集失败，已重试 {attempts} 次并终止任务"
+            )
     return artifacts
 
 
@@ -396,20 +588,43 @@ def collect_spark_ui(
         page_name, page_url = _resolve_page_spec(base_url, page, index)
         _open_url(page_url)
         time.sleep(wait_seconds)
-        snapshot = _capture_page_snapshot()
-        title = str(snapshot.get("title") or page_name)
-        current_url = str(snapshot.get("url") or page_url)
-        rendered = _render_page_markdown(page_name, title, current_url, snapshot)
+        snapshot, title, current_url, matched, attempts = _capture_page_for_expected_url(
+            page_url, page_name, wait_seconds=wait_seconds
+        )
+        content_ok, content_note = _page_content_matches(page_name, snapshot)
+        note = f"page capture attempts={attempts}"
+        if not content_ok:
+            note = f"{note}; {content_note}"
+        rendered = (
+            _render_page_markdown(page_name, title, current_url, snapshot)
+            if matched
+            else _render_page_failure_markdown(
+                page_name,
+                title,
+                page_url,
+                current_url,
+                snapshot,
+                note=note,
+            )
+        )
         file_path = _write_page_artifact(out_dir, page_name, rendered)
-        page_texts[page_name] = _snapshot_to_search_text(snapshot)
+        if matched:
+            page_texts[page_name] = _snapshot_to_search_text(snapshot)
         artifacts.append(
             PageArtifact(
                 page=page_name,
-                url=current_url or page_url,
+                expected_url=page_url,
+                captured_url=current_url or "",
+                url=page_url,
                 title=title,
                 file_name=str(file_path.relative_to(out_dir.parent)),
+                status="ok" if matched else "mismatch",
+                note=note,
             )
         )
+        if not matched:
+            _write_manifest(out_dir, base_url, artifacts)
+            raise RuntimeError(f"Spark UI {page_name} 采集失败，已重试 {attempts} 次并终止任务")
     if "jobs" in page_texts:
         job_ids = _extract_candidate_ids(page_texts["jobs"], "jobs")
         artifacts.extend(
@@ -420,26 +635,7 @@ def collect_spark_ui(
         artifacts.extend(
             _collect_detail_pages(base_url, out_dir, "stages", "stage", stage_ids, wait_seconds, limit=detail_limit)
         )
-    manifest = {
-        "base_url": base_url,
-        "pages": [asdict(item) for item in artifacts],
-    }
-    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
-    manifest_md = ["# Spark 界面浏览器采集", ""]
-    manifest_md.append(f"基础链接：`{base_url}`")
-    manifest_md.append("")
-    manifest_md.append("| 页面 | 标题 | 链接 | 文件 |")
-    manifest_md.append("|---|---|---|---|")
-    for item in artifacts:
-        manifest_md.append(f"| `{item.page}` | `{item.title}` | `{item.url}` | `{item.file_name}` |")
-    manifest_md.append("")
-    manifest_md.append("## 说明")
-    manifest_md.append("")
-    manifest_md.append("- 每个文件都保存了浏览器导航后可见的页面内容，优先保留表格块为 Markdown table。")
-    manifest_md.append("- `details/` 目录保存自动下钻的 job / stage 详情页，里面的 task 表也会按表格保留；如果 task 数量过多，只保留当前第一页 task 明细。")
-    manifest_md.append("- 这个采集方式依赖当前 Chrome 登录态。")
-    manifest_md.append("- 将生成的 `input/spark_ui/browser/` 目录交给 `collect_case_context.py` 继续处理。")
-    (out_dir / "manifest.md").write_text("\n".join(manifest_md) + "\n", encoding="utf-8")
+    _write_manifest(out_dir, base_url, artifacts)
     return artifacts
 
 
@@ -472,7 +668,11 @@ def main() -> int:
     args = parser.parse_args()
 
     pages = [item.strip() for item in args.pages.split(",") if item.strip()]
-    collect_spark_ui(args.base_url, args.output_dir, pages, args.wait_seconds, args.detail_limit)
+    try:
+        collect_spark_ui(args.base_url, args.output_dir, pages, args.wait_seconds, args.detail_limit)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
     print(args.output_dir / "manifest.md")
     return 0
 
