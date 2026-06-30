@@ -5,3 +5,6 @@
 - `source-analysis-rules.md`：源码阅读规则、输出要求和约束
 - `step-1-contract.md`：第 1 步源码阅读调用契约
 
+## 资源
+
+- `assets/`：源码阅读专属样例、模板和结果框架

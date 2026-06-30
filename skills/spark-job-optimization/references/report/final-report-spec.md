@@ -21,9 +21,10 @@
 - 第 4 章基于根因输出优化方案和待确认项。
 - 第 5 章补人工确认后的代码变更、代码快照和映射图。
 - 第 6 章补优化后验证、前后对比和经验沉淀。
+- 第 3 章和第 4 章属于主 skill 的内置核心分析能力，不再以独立 sub skill 形式对外暴露。
 - `<business_repo_root>/tmp/spark-job-optimization/<case_name>/output/` 下保留第 4 章单独的文字版和图片版。
 - 版式优先参考 `final-report-template.md`。
-- 第 4 章细节和图片继续参考 `../../subskills/diagnosis-and-proposal/references/step-4-report-template.md` 与 `../assets/step4-report-sample.svg`。
+- 第 4 章细节和图片继续参考 `step-4-report-template.md` 与 `../assets/step4-report-sample.svg`。
 - 第 5 章变更映射图参考 `step-5-code-change.md` 与对应样例资源。
 - 第 6 章优化结果图参考 `../../subskills/verification-and-benchmark/references/step-6-final-verification.md` 与对应样例资源。
 - 第 6 章对比基于 `input/spark_ui/browser/` 和 `input/spark_ui/optimized_browser/`。

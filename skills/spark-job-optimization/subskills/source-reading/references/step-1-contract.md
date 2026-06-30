@@ -5,16 +5,8 @@
 ### 必需
 
 - `--doc`
-  - 源码目录
-  - 源码压缩包
-  - 描述源码位置、入口文件和主链路的文档
-
-### 可选
-
-- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/context/context_report.md`
-- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/context/upstream_tables.md`
-- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/spark_ui/browser/`
-- `<business_repo_root>/tmp/spark-job-optimization/<case_name>/input/eventlog/`
+  - 单个源码说明文档链接
+  - 文档必须包含源码目录、主类/主函数、传入参数三部分，其中传入参数可以标注为 `无`
 
 ## 输出
 
@@ -29,7 +21,7 @@
 
 ### 输出要求
 
-- 输出可直接进入最终报告第 1 章
+- 输出结构化的源码分析结果
 - 每个 stage 必须能回指到源码范围
 - 不能输出根因排序和优化建议
 
@@ -42,5 +34,6 @@
 ## 验收
 
 - 输入足以定位至少一个源码入口
-- 输出可直接供父 skill 进入第 3 步
+- 只使用一个源码说明文档链接作为输入
+- 输出结构化的源码分析结果
 - 每个 stage 结果都能回指到源码和缺失证据

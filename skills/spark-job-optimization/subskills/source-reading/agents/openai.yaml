@@ -1,4 +1,4 @@
 interface:
-  display_name: "PySpark 源码阅读"
+  display_name: "源码阅读"
   short_description: "通过 --doc 按 Spark stage 阅读 PySpark 源码"
-  default_prompt: "使用 $pyspark-source-reading 通过 --doc 指定源码位置或源码说明文档，并按 Spark stage 阅读 PySpark 源码。"
+  default_prompt: "使用 $source-reading 通过 --doc 指定源码位置或源码说明文档，并按 Spark stage 阅读 PySpark 源码。"

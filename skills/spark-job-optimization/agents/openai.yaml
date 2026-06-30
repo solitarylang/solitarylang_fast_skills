@@ -1,4 +1,7 @@
 interface:
   display_name: "Spark 作业优化"
   short_description: "阅读源码与日志定位 Spark 瓶颈"
-  default_prompt: "使用 $spark-job-optimization 分析 Spark 作业的源码和日志，定位瓶颈并给出最小化优化方案。"
+  default_prompt: "使用 $spark-job-optimization 分析 Spark 作业的源码和日志，定位瓶颈并给出最小化优化方案；如需兼容入口，也可使用 /spark-job-optimization-skill。"
+
+policy:
+  allow_implicit_invocation: true
